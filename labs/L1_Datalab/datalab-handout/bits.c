@@ -143,7 +143,8 @@ NOTES:
  *   Rating: 1
  */
 int bitXor(int x, int y) {
-  return 2;
+  return ~(x & y) & (~(~x & ~y));
+  // debug
 }
 /* 
  * tmin - return minimum two's complement integer 
@@ -152,9 +153,7 @@ int bitXor(int x, int y) {
  *   Rating: 1
  */
 int tmin(void) {
-
-  return 2;
-
+  return (1 << 31);
 }
 //2
 /*
@@ -165,8 +164,14 @@ int tmin(void) {
  *   Rating: 1
  */
 int isTmax(int x) {
-  return 2;
+    int t1 = (x+1) ;    // t1 should be TMin and not 0
+    int t2 = !t1 ;   // t2 should be 0 if t1 is not 0.
+    int t3 = t1 ^ x ;   // t3 should be all 1's
+    int t4 = ~t3 ;      // t4 should be all 0's
+    // total op is 7.
+  return  (!(t4)) & !t2  ;
 }
+
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   where bits are numbered from 0 (least significant) to 31 (most significant)
@@ -176,7 +181,14 @@ int isTmax(int x) {
  *   Rating: 2
  */
 int allOddBits(int x) {
-  return 2;
+    // t1 should be 0xAAAAAAAA
+    int t1 = 0xAA + (0xAA << 8) + (0xAA << 16) + (0xAA << 24) ;
+    // t2 will equal to t1 *if and only if* all the odd bits are set.
+    int t2 = x & t1 ; 
+    // t3 will be all 0's if t1 == t2.
+    int t3 = t1 ^ t2 ; 
+    // total ops is 9.
+  return !t3;
 }
 /* 
  * negate - return -x 
@@ -186,7 +198,7 @@ int allOddBits(int x) {
  *   Rating: 2
  */
 int negate(int x) {
-  return 2;
+  return (~x+1);
 }
 //3
 /* 
@@ -199,7 +211,24 @@ int negate(int x) {
  *   Rating: 3
  */
 int isAsciiDigit(int x) {
-  return 2;
+    // all the higher Bits should be 0
+    // this variable will be 1 if the higher bits are 0, 0 otherwise.
+    int t1 = ~(0xFF) & x ; 
+
+    // For the lower 8 bits. The Higher 4 should be 0011
+    int t2 = 0xF0 & x ; 
+    int t3 = t2 ^ 0x30 ; // t3 should be all 0s
+    // int t4 = !t3 ; // t4 should be 1.
+
+    // For the lower 8 bits. The lower 4 should be from 0000 to 1001
+    // check if the 1100 is set or 1010 is set.
+    // if so t5 will be 1, else t5 will be 0.
+    // same for t6.
+    int t5 = !((x & 0xC)^(0xC)) ;
+    int t6 = !((x & 0xA)^(0xA)) ;
+    
+    return !(t1 | t3) & !(t5 | t6);
+    // total ops: 15
 }
 /* 
  * conditional - same as x ? y : z 
@@ -209,8 +238,17 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+    // will be either 0 or 1.
+    int xcond = !(!x) ;
+
+    // ymask will be 0xFFFFFFFF if xcond is 1
+    // will be 0 if xcond is 0.
+    int ymask = (~xcond)+1 ;
+    int zmask = ~ymask ;
+
+    return (y & ymask) | (z & zmask);
 }
+
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
  *   Example: isLessOrEqual(4,5) = 1.
@@ -219,7 +257,34 @@ int conditional(int x, int y, int z) {
  *   Rating: 3
  */
 int isLessOrEqual(int x, int y) {
-  return 2;
+    // need to handle when y is Tmin.
+    int negY = ~y + 1 ; 
+
+    // test if x == y
+    // 1 if x == y, 0 otherwise.
+    int xEqualY = !(x^y) ; 
+
+    // int highestBit = 0x1 << 31 ; 
+    int DifferentSign = (((x ^ y) >> 31) & 0x1) ; 
+    int xIsNeg = (x >> 31) & 0x1;
+        
+    // t1 = x-y
+    int t1 = x+negY ; 
+
+    // t2 = -t1, test if t2 >= 0
+    int t2 = ~t1 + 1 ; 
+
+    // test if the highest bit is set.
+    // if highest bit is set, then t2 is negative and !t3 is 0. 
+    // t3 is 1 if t2 is negative, 0 otherwise.
+    int t3 = !(t2 & (0x1 << 31)) ; 
+
+    // printf("t0=%X,t1=%X,t2=%X,t3=%X\n", t0,t1,t2,t3) ; // debug
+    // printf("x=%d,y=%d,DifferentSign=%d, xIsNeg=%d\n", 
+    //        x,y,DifferentSign, xIsNeg) ; // debug
+
+    return  (((DifferentSign) & xIsNeg) | t3 | xEqualY) & !((DifferentSign) & !xIsNeg) ;
+    // total ops: 22
 }
 //4
 /* 
