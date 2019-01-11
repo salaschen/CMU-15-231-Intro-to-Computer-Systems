@@ -296,8 +296,25 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+    // implement the ! using all operators except !.
+    // max ops: 12
+    // rating: 4
+    
+    // try to test if x is zero
+    // t0 is 1 when the highest bit of x is 0.
+    int t0 = (x >> 31 & 0x1)^0x1 ; 
+    // t1 = -t0
+    int t1 = ~x+1; 
+    // t2 is 1 when the highest bit of t1 is 0.
+    int t2 = (t1 >> 31 & 0x1)^0x1 ;
+    // only zero has the property of 1) highest bit is zero.
+    // 2) its negation's highest bit is zero.
+    int xIsZero = t0 & t2 ;
+
+    return xIsZero ;
+    // total ops: 9
 }
+
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
  *  Examples: howManyBits(12) = 5
