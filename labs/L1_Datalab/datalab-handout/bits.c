@@ -328,40 +328,53 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-    int isNeg = (x >> 31) & 0x1;
-    int zeroAppeared = (isNeg^(x >> 30)) & 0x1 ;
-    int result = 1 + zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>29))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>28))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>27))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>26))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>25))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>24))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>23))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>22))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>21))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>20))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>19))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>18))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>17))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>16))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>15))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>14))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>13))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>12))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>11))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>10))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>9))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>8))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>7))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>6))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>5))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>4))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>3))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>2))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^(x>>1))& 0x1)  ; result += zeroAppeared ;
-    zeroAppeared = zeroAppeared | ((isNeg^x)&0x1) ; result += zeroAppeared ;
-    return result ;
+    /**
+    * Inspired by Nikita Chepanov - nchepano@andrew.cmu.edu
+    * To find the number of bits needed, it's
+    * 1) for negative number: find the most significant 0.
+    * 2) for non-negative number: find the most significant 1.
+    * But we're going to cast x to positive anyway.
+    *
+    * The basic idea is to use binary search to find the most
+    * significant bit. Starting from the highest 16 bit.
+    */
+
+    // cast y to the positive number that has the same result bits
+    // with x.
+    int y = x^(x>>31) ;
+
+    // setting up the bit masks
+    int mask1 = 2 ;           // 10
+    int mask2 = 12 ;          // 1100
+    int mask4 = 0xF0 ;        // 0xF0
+    int mask8 = (0xFF) << 8 ; // 0xFF00
+    int mask16 = ((0xFF << 8) | (0xFF)) << 16 ; // 0xFFFF0000
+
+    int bitnum ;
+    int result = 1 ;
+
+    // whether in the higher 16 bits has a 1.
+    // if so, t0 will be 1, otherwise 0.
+    int t0 = !!(mask16 & y) ;
+    // bitnum is 16 if t0 is 1. meaning we can continue search 
+    // in the higher 16 bits.
+    // otherwise bitnum is 0 << 4 is still 0.
+    bitnum = t0 << 4 ; 
+    result += bitnum ; 
+    // skip the lower bits if necessary.
+    y = y >> bitnum ; 
+
+    t0 = !!(mask8 & y) ; bitnum = t0 << 3 ; // same as above, bitnum = 8 if t0 = 1
+    result += bitnum ; y = y >> bitnum ;
+
+    t0 = !!(mask4 & y) ; bitnum = t0 << 2 ; result += bitnum ; y = y >> bitnum ;
+
+    t0 = !!(mask2 & y) ; bitnum = t0 << 1 ; result += bitnum ; y = y >> bitnum ;
+
+    t0 = !!(mask1 & y) ; bitnum = t0 ; result += bitnum ; y = y >> bitnum ;
+
+    return result+(y&1) ;
+   return result ;
 }
 //float
 /* 
