@@ -328,7 +328,40 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+    int isNeg = (x >> 31) & 0x1;
+    int zeroAppeared = (isNeg^(x >> 30)) & 0x1 ;
+    int result = 1 + zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>29))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>28))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>27))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>26))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>25))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>24))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>23))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>22))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>21))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>20))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>19))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>18))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>17))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>16))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>15))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>14))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>13))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>12))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>11))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>10))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>9))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>8))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>7))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>6))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>5))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>4))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>3))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>2))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^(x>>1))& 0x1)  ; result += zeroAppeared ;
+    zeroAppeared = zeroAppeared | ((isNeg^x)&0x1) ; result += zeroAppeared ;
+    return result ;
 }
 //float
 /* 
