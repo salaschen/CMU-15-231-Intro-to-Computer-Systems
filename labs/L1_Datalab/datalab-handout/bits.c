@@ -388,9 +388,50 @@ int howManyBits(int x) {
  *   Max ops: 30
  *   Rating: 4
  */
-unsigned floatScale2(unsigned uf) {
-  return 2;
+int isNaN(unsigned uf) ;
+int isDenormalized(unsigned uf)
+{
+    unsigned emask = ((1 << 8) - 1) << 23 ;
+    if ((uf & emask) == 0) {
+        return 1 ;
+    }
+    return 0 ;
 }
+unsigned floatScale2(unsigned uf)
+{   
+    if (isNaN(uf) == 1) {
+       return uf ;
+    }
+    else if (isDenormalized(uf) == 1) {
+        int topBit = !!(uf & (1 << 31)) ;
+        unsigned result = (topBit << 31) | (uf << 1) ;
+        return result ;
+    }
+    else {
+        unsigned emask = ((1 << 8) - 1) << 23 ;
+        unsigned epart = (((uf & emask) >> 23) + 1) << 23 ;
+        unsigned other = (uf & (~emask)) ;
+        unsigned all = epart | other ;
+        return all ;
+    }
+}
+
+int isNaN(unsigned uf) 
+{
+    int eMask = (~((1<<23)-1)) ^ (1 << 31) ;
+    int mMask = (1 << 23) - 1 ;
+    int exp = (uf & eMask) >> 23 ;
+    int lowEMask = eMask >> 23 ;
+    
+    int t = ((~exp) & lowEMask)  ;
+    if (t == 0) {
+        return 1 ; 
+    }
+    else {
+        return 0 ;
+    }
+}   
+
 /* 
  * floatFloat2Int - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
