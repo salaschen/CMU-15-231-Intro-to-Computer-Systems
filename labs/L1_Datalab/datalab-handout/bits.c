@@ -419,10 +419,9 @@ unsigned floatScale2(unsigned uf)
 int isNaN(unsigned uf) 
 {
     int eMask = (~((1<<23)-1)) ^ (1 << 31) ;
-    int mMask = (1 << 23) - 1 ;
+    // int mMask = (1 << 23) - 1 ;
     int exp = (uf & eMask) >> 23 ;
     int lowEMask = eMask >> 23 ;
-    
     int t = ((~exp) & lowEMask)  ;
     if (t == 0) {
         return 1 ; 
@@ -445,8 +444,33 @@ int isNaN(unsigned uf)
  *   Rating: 4
  */
 int floatFloat2Int(unsigned uf) {
-  return 2;
+    if (isNaN(uf) == 1) {
+        return 0x80000000u ; 
+    }
+    unsigned exp = (uf >> 23) & 0xFF ;
+    int bias = (1 << 7) - 1 ; 
+    if (exp < bias) {
+        return 0 ;
+    }
+    else {
+        int digits = exp - bias ;
+        if (digits >= 23) 
+            return 0x80000000u ;
+        int shift = 23 - digits ;  
+        int mask = (1 << digits) - 1 ;  
+        
+        int sign = !!((1 << 31) & uf) ;
+        uf = uf >> shift ;
+        
+        int num = (uf & mask) | (1 << digits);
+        if (sign == 1) { 
+            num = (~num) + 1 ;
+        }
+        return num;
+    }
+    return 0 ;
 }
+
 /* 
  * floatPower2 - Return bit-level equivalent of the expression 2.0^x
  *   (2.0 raised to the power x) for any 32-bit integer x.
