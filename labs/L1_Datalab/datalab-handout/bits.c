@@ -484,6 +484,26 @@ int floatFloat2Int(unsigned uf) {
  *   Max ops: 30 
  *   Rating: 4
  */
+#define INF 0x7F800000
 unsigned floatPower2(int x) {
-    return 2;
+  if (x > 127) {
+        return INF ;
+   }
+   else if (x < -149) {
+        return 0 ;
+   }
+   
+   // normalized
+   if (x >= -126) {
+        int bias = 127 ; 
+        unsigned exp = x + bias ;
+        return (exp << 23) ;
+   }
+   
+   // denormalized
+   else {
+        int exp = -(x + 126) ;
+        int shift = 23 - exp ;
+        return 1 << shift ;
+   }
 }
